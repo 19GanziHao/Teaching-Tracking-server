@@ -1,0 +1,12 @@
+http:
+  host: 'localhost'
+  port: 3000
+
+db:
+  mysql:
+    type: 'mysql'
+    host: 'localhost'
+    port: 3306
+    username: 'root'
+    password: '2002gzh...'
+    database: 'teaching_tracking'
