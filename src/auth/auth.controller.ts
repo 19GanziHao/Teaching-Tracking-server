@@ -12,6 +12,7 @@ export class AuthController {
   @Public()
   @Post('login')
   signIn(@Body() signInDto: LoginDto) {
+    console.log(123);
     return this.authService.signIn(signInDto.email, signInDto.password);
   }
 

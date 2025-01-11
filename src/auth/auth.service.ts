@@ -6,6 +6,7 @@ import { RegisterDto } from './dto/register.dto';
 import { Roles } from 'src/user/entity/roles.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LoginResponseDto } from './dto/loginRepsonse.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,18 +23,15 @@ export class AuthService {
    * @param password 密码
    * @returns
    */
-  async signIn(email: string, password: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<LoginResponseDto> {
     // 查询用户
     const user = await this.userService.findUserByEmail(email);
     console.log(user);
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('用户名不存在');
     // 密码校验
-    const isPwdValid = await bcrypt.compare(
-      await genPwd(password),
-      user?.password || '',
-    );
-    if (isPwdValid) {
-      throw new UnauthorizedException();
+    const isPwdValid = await bcrypt.compare(password, user?.password || '');
+    if (!isPwdValid) {
+      throw new UnauthorizedException('密码错误');
     }
     // 负载 用于 jwt 签名
     const payload = { sub: user.id, name: user.name };
@@ -49,7 +47,7 @@ export class AuthService {
    * 注册
    * @param registerDto
    */
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<void> {
     let { password } = registerDto;
     const { role: roleName, name, email } = registerDto;
     // 加密密码

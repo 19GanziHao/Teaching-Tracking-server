@@ -16,8 +16,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     AuthModule,
     UserModule,
     TypeOrmModule.forRootAsync({
+      // 需引入config 因为需要的配置在其中
       imports: [ConfigModule],
       inject: [ConfigService],
+      // 数据库的创建
       useFactory: (configService: ConfigService) => ({
         type: configService.get<'mysql'>('db.mysql.type'),
         host: configService.get<string>('db.mysql.host'),
@@ -35,6 +37,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         return dataSource;
       },
     }),
+    // setting config source
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

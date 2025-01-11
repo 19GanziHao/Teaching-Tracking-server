@@ -17,10 +17,12 @@ export class UserService {
    * @returns 用户
    */
   async findUserByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({
+    console.log(email);
+    const user = this.userRepository.findOne({
       where: { email },
       relations: ['roles'],
     });
+    return user;
   }
 
   /**
