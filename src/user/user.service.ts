@@ -17,8 +17,7 @@ export class UserService {
    * @returns 用户
    */
   async findUserByEmail(email: string): Promise<User | null> {
-    console.log(email);
-    const user = this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email },
       relations: ['roles'],
     });

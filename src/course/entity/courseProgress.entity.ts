@@ -39,7 +39,7 @@ export class CourseProgress {
   /**
    * 填表日期
    */
-  @Column()
+  @Column({ type: 'timestamp' })
   submissionDate: Date;
 
   /**

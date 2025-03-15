@@ -24,10 +24,13 @@ export class AuthGuard implements CanActivate {
     if (isNoValid) return true;
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    // 格式是 Bearer token
+    let token = this.extractTokenFromHeader(request);
+
     if (!token) {
       throw new UnauthorizedException();
     }
+    token = token.replace('Bearer ', '');
     try {
       // 验证token
       const payload = await this.jwtService.verifyAsync(token, {

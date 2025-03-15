@@ -5,16 +5,18 @@ import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as yaml from 'js-yaml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { UserModule } from 'src/user/user.module';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { CourseModule } from 'src/course/course.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    CourseModule,
     TypeOrmModule.forRootAsync({
       // 需引入config 因为需要的配置在其中
       imports: [ConfigModule],
@@ -28,6 +30,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         password: configService.get<string>('db.mysql.password'),
         database: configService.get<string>('db.mysql.database'),
         autoLoadEntities: true,
+        timezone: '+08:00', // 设置为中国时区
         entities: [],
         synchronize: false,
         namingStrategy: new SnakeNamingStrategy(), // 使用下划线命名策略,

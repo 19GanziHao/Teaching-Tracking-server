@@ -21,12 +21,6 @@ export class HoursDistribution {
   lectureHours: number;
 
   /**
-   * 授课对象班级
-   */
-  @Column()
-  className: string;
-
-  /**
    * 实验学时
    */
   @Column()

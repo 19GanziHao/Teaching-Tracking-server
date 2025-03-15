@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Roles } from './roles.entity';
 
-@Entity('Users')
+@Entity('users')
 export class User {
   /**
    * 主键
