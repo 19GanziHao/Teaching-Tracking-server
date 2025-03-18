@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
     let token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('登录失效');
     }
     token = token.replace('Bearer ', '');
     try {
@@ -38,7 +38,7 @@ export class AuthGuard implements CanActivate {
       });
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('登录失效');
     }
     return true;
   }

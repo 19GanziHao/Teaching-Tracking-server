@@ -18,6 +18,11 @@ export class teachingSchedule {
   id: number;
 
   /**
+   * 每周的时间，比如第一周应该是几月几号
+   */
+  @Column()
+  weekTime: string;
+  /**
    * 校历周次
    */
   @Column()

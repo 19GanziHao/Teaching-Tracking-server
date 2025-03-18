@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CourseDto } from './dto/course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CourseProgress } from './entity/courseProgress.entity';
@@ -11,6 +15,8 @@ import { teachingSchedule } from './entity/teachingSchedule.entity';
 import { queryCourseDto } from './dto/QueryCourseDto';
 import { findCourseVo } from './vo/findCourseVo';
 import { CourseVo } from './vo/courseVo';
+import getWeekDates from 'src/utils/getWeekDates';
+import { PerformCourseVo } from './vo/performCourseVo';
 
 @Injectable()
 export class CourseService {
@@ -68,6 +74,7 @@ export class CourseService {
       classInfo,
       hoursDistribution,
       textbookInfo,
+      user: { id: courseDto.userId }, // 添加用户关联
     });
     await this.courseProgressRepository.save(courseProgress);
 
@@ -85,7 +92,8 @@ export class CourseService {
    * 查询所有课程进度表
    */
   async findCourse(query: queryCourseDto): Promise<findCourseVo> {
-    const where = Object.keys(query).reduce(
+    const { userId, ...rest } = query;
+    const where = Object.keys(rest).reduce(
       (pre, cur: keyof queryCourseDto) => {
         // 排除分页参数，只对查询条件进行模糊匹配
         if (!(cur !== 'pageNum' && cur !== 'pageSize')) return pre;
@@ -108,7 +116,9 @@ export class CourseService {
         }
         return pre;
       },
-      {} as Record<string, any>,
+      {
+        user: { id: userId },
+      } as Record<string, any>,
     );
     const [list, total] = await this.courseProgressRepository.findAndCount({
       where,
@@ -124,6 +134,26 @@ export class CourseService {
       total,
       pageSize: query.pageSize || 10,
       pageNum: query.pageNum || 1,
+    };
+  }
+
+  /**
+   * 查询正在进行中的课程 (这周内)
+   */
+  async findCourseByPerform(): Promise<PerformCourseVo> {
+    const { monday, sunday } = getWeekDates();
+    const [list, total] = await this.teachingScheduleRepository.findAndCount({
+      where: {
+        weekTime: Between(monday, sunday),
+      },
+      relations: {
+        courseProgress: true,
+      },
+    });
+
+    return {
+      list: list.map((i) => i.courseProgress),
+      total,
     };
   }
 
@@ -237,11 +267,16 @@ export class CourseService {
   /**
    * 删除课程
    * @param id number
+   * @param userId number
    */
-  async deleteCourse(id: number) {
+  async deleteCourse(id: number, userId: number) {
     const course = await this.findCourseById(id);
     if (!course) {
       throw new NotFoundException('课程不存在');
+    }
+    // 验证用户权限
+    if (course?.user?.id !== userId) {
+      throw new ForbiddenException('无权限删除此课程');
     }
     await this.courseProgressRepository.delete(id);
     // 删除关联数据

@@ -1,5 +1,9 @@
 export class CourseDto {
   /**
+   * 用户id
+   */
+  userId: number;
+  /**
    * 课程名称
    */
   courseName: string;

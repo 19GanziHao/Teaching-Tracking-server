@@ -26,17 +26,18 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<LoginResponseDto> {
     // 查询用户
     const user = await this.userService.findUserByEmail(email);
-    console.log(user);
-    if (!user) throw new UnauthorizedException('用户名不存在');
-    // 密码校验
-    const isPwdValid = await bcrypt.compare(password, user?.password || '');
-    if (!isPwdValid) {
-      throw new UnauthorizedException('密码错误');
+
+    if (!user || !(await bcrypt.compare(password, user?.password || ''))) {
+      throw new UnauthorizedException('邮箱或密码错误');
     }
+
     // 负载 用于 jwt 签名
     const payload = { sub: user.id, name: user.name };
     return {
-      token: await this.jwtService.signAsync(payload), // 生成token
+      token: await this.jwtService.signAsync(payload, {
+        expiresIn: '2d', // 过期时间
+      }), // 生成token
+      userId: user.id,
       name: user.name,
       email: user.email,
       roles: user.roles.map((item) => item.name),

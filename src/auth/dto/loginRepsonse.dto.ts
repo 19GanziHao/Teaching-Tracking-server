@@ -1,6 +1,9 @@
 export class LoginResponseDto {
   token: string;
 
+  /** 用户ID */
+  userId: number;
+
   /** 用户名 */
   name: string;
 

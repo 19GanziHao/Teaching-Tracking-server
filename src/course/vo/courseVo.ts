@@ -1,3 +1,5 @@
+import { User } from 'src/user/entity/users.entity';
+
 interface TeacherInfoVo {
   id?: number;
   teacherName?: string;
@@ -59,4 +61,5 @@ export class CourseVo {
   hoursDistribution?: HoursDistributionVo;
   textbookInfo?: TextbookInfoVo;
   teachingSchedule?: TeachingScheduleVo[];
+  user?: User;
 }

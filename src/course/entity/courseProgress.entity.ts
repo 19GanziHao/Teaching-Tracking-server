@@ -4,11 +4,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TeacherInfo } from './teacherInfo.entity';
 import { ClassInfo } from './classInfo.entity';
+import { User } from 'src/user/entity/users.entity';
 
 @Entity()
 export class CourseProgress {
@@ -89,4 +91,8 @@ export class CourseProgress {
     name: 'textbook_id',
   })
   textbookInfo: TextbookInfo;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
